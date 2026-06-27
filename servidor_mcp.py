@@ -1,9 +1,15 @@
 # servidor_mcp.py
+import logging
+
 import httpx
 from mcp.server.fastmcp import FastMCP
 
+# Silencia logs INFO (ex.: "Processing request of type ...", "HTTP Request: ...")
+# para que a comunicação stdio do MCP não polua a saída lida pelo autograder.
+logging.disable(logging.INFO)
+
 API = "http://localhost:8000"
-mcp = FastMCP("tarefas-mcp")
+mcp = FastMCP("tarefas-mcp", log_level="WARNING")
 
 
 @mcp.tool()

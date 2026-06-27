@@ -1,9 +1,16 @@
 # cliente_teste.py
 import asyncio
 import json
+import logging
+import os
+import sys
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+# Garante que só o envelope JSON vá para o stdout: silencia logs e descarta
+# o stderr do processo do servidor MCP.
+logging.disable(logging.INFO)
 
 
 def _extrai(resultado, como_lista=False):
@@ -33,8 +40,9 @@ def _extrai(resultado, como_lista=False):
 
 
 async def main() -> dict:
-    params = StdioServerParameters(command="python", args=["servidor_mcp.py"])
-    async with stdio_client(params) as (read, write):
+    params = StdioServerParameters(command=sys.executable, args=["servidor_mcp.py"])
+    devnull = open(os.devnull, "w")
+    async with stdio_client(params, errlog=devnull) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
 
